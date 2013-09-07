@@ -1,0 +1,36 @@
+Project ASIMOV - Autonomous Systems Integrated Mobile Objective Vehicles or something like that, it doesn't matter but do tell if you have a more sensical acronym. I just chose ASIMOV because I just re-read the Foundation series.
+
+
+   ASIMOV is the software system I am designing to power Hawking, ANDROS, and be a general purpose system for autonomous vehicles. The design is centered around separate well-defined systems (based upon data and its transformations) and the client-server model. The client-server model has worked fairly well and the primary failings were based around the vision processing and the artificial intelligence not the architecture.
+
+
+   To directly copy and paste from the design document I am writing: "ASIMOV’s design philosophy is to be a lightweight, efficient, data-driven framework for the distributed processing of an autonomous vehicle." I will upload the design document when it reaches a more complete state.
+
+
+To give a concise version of the main goals that I am keeping in mind:
+   -Distributability. Utilize as many cores as are available on one or more computers.
+   -Maintainability. I hope that this software system has a slightly longer lifespan than this club's usual software systems.
+   -Modularity. There will be multiple systems loosely connected. I wish to separate my development team by tasks without them having to be as dependent on each other for progress. This also allows essential systems to be prioritized before non-essential systems have valuable development time. For example, the vision processing system will have several dedicated developers assigned to it (if I can find some).
+   -Minimal dependencies. I really hate software packages that depend upon a lot of external libraries and have an unnecessarily complex build system therefore the only external dependencies I will accept are those that I cannot reasonably ignore.
+   -Efficiency. This is an essential attribute that many premade solutions ignore that we cannot afford to ignore. Acquiring an IMU will actually solve a lot of my problems here and allow the majority of computing time to be given to the vision algorithms.
+   -Ease of access.  A gentle learning curve would contribute greatly to an increase in developers.
+
+
+A brief overview of the technologies used in case anyone wants to brush up on their knowledge of them:
+   -OpenCV.  This library has no equal in any regard when it comes to real-time image processing.
+   -Ubuntu LTS.  ASIMOV is designed to be compatible with any Linux or Intel Apple system but Ubuntu will just be the "officially" supported one that I guarantee will work.
+   -Subversion.  Rather obvious but this is still very nice for system versioning.
+   -Make.  I cannot stress enough how nice the build system will be.
+   -C++.  I have not decided yet whether the C++11 or C++03 standard. 
+   -SQL.  If there is available developer time, a lightweight database will be used to record information in real-time for later playback and analysis. I have not settled on a particular database system and it is not a high priority yet it would certainly be very useful. This would primarily be a testing utility.
+   -BSD sockets.  This provides much of ASIMOV's internal workings.
+
+
+   The full-length first draft of the software design documents should be finished by the end of July. My approach this year to being the head of IGVC software development is to write up a comprehensive design document fully outlining the entire architecture and all tasks to be completed along with tenative completion dates. I'm hoping that will encourage other developers besides myself to take a more active interest by giving them more clearly defined stuff to do. With any luck, the recruiting meetings will be moderately successful and I will gain many serfs.
+
+
+-Daniel Oliver
+July 2, 2013
+
+
+

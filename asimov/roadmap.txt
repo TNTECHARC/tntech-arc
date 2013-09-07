@@ -1,0 +1,63 @@
+Author: Daniel Oliver
+Last Modified: August 8, 2013.
+
+This is not comprehensive or detailed but it should give a decent idea of what needs to be done. The completion dates are unreliable and are dependent on the recruitment and dedication of members.
+
+Software tasks, estimated time, priority, and difficulty:
+	1.   Finish implementation and testing of sensor hardware drivers. 9/8/2013 (Given to Dan O.) High priority. Medium difficulty.
+	2.   Work with hardware team to make new motor interface to overcome Hawking's built in motor controller limitations. Hopefully at least a temporary fix by 9/15/2013. (Dan O. and hardware team) High priority. Medium-low difficulty.
+	3.   Make linux xbox controller driver. 9/20/2013 (Unassigned) Low priority. Low difficulty.
+	4.   Design and implement algorithms to combine GPS and IMU data in realtime to track/predict robot movement. 9/20/2013 (date dependent on IMU acquisition) (Unassigned) High priority. Medium-low difficulty
+	5.   Design and implement algorithms to filter spurious values and detect obstacles using the laser range finder. 10/5/2013 (Unassigned) High priority. Medium-high difficulty.
+	6.   Design and implement algorithms to detect white lines and obstacles using the camera. Unknown date (Unassigned) High priority. Very high difficulty.
+	7.   Design and implement algorithms to create an efficient and expandable world map using the processed sensor data. 10/30/2013 (Unassigned) High priority. High difficulty.
+	8.   Design and implement an artificial intelligence that given a set of goals and access to the world map can make informed decisions as how to best complete the next goal. Date unknown. (Unassigned. This task goes hand in hand with the world map.) High priority. High difficulty.
+	9.   Design and create a database that can store sensor values and then replay the stored world at a later time. Unknown date. (Unassigned) Low priority. Medium difficulty.
+	10.  Design and implement a client matching the JAUS protocols. 2/15/2014 (Unassigned) Medium priority. Unknown difficulty.
+The general order of tasks:
+	Hardware interfaces -> GPS and IMU -> Laser Range Finder and Camera -> World Map and AI -> Additional utilities and JAUS.
+
+I have spent many many hours researching the theory, algorithms and mathematics and I barely scratched the surface. Since there are so many methods I will leave the implementation up to the programmer and instead give a general idea of the responsibilities and output data necessary.
+
+I do not really care what language is used so long as the packet formats and tcp client are compatible.
+
+There are a number of system modules each with a general responsibility and input/output. Each system module also contains  a TCP client connected to the server. There are sample Python/C++ clients and the interface is pretty transparent so the client should be pretty easy to integrate.
+
+The data packets are defined in Google Protocol Buffer in the "messages" subdirectory. Some of the packets are yet to be defined and will be up to the system module's programmer for specifics.
+
+System Modules:
+	Camera. 
+-Responsibility: Detect white lines. 
+-Input: Webcam
+-Output: A series of connected points designating the white line in local space.
+-Possible implementation: Hough filters.
+	Positioning.
+-Responsibility: Combine GPS and IMU using filters to accurately track/predict movement of the robot.
+-Input: GPS and IMU.
+-Output: Its position, rotation, and velocity. (All in 3D).
+-Possible implementation: Kalman filters and Haversine formula.
+	Radar.
+-Responsibility: Filter the laser range finder.
+-Input: Array of distances using the laser range finder.
+-Output: An array of points that are known to be real obstacles.
+-Possible implementation: Some kind of noise filter, particle filter, or some combination? 
+	Mapping and AI.
+-Responsibility: Create a world map that is searchable by the AI. Also contains the AI for efficiency's sake.
+-Input: Every processed sensor and a set of goals.
+-Output: Motor controller commands
+-Possible implementation: Quadtree and search algorithms.
+	JAUS:
+-Responsibility: Comply to next year's IGVC JAUS requirements
+-Input: Every data channel on the server. (That means everything)
+-Output: Whatever JAUS requires.
+	Database:
+-Responsibility: Store processed sensor data.
+-Input: Every data channel on the server.
+-Output: Nothing except during playback.
+	Human interface.
+-Responsibility: Display data to the human and send out commands.
+-Input: Every data channel on the server.
+-Output: Whatever commands the human wants to send.
+
+TODO: Actually finish this design document
+
