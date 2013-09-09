@@ -1,0 +1,41 @@
+package asimov;
+
+
+//Daniel Oliver
+//September 9, 2013
+//This entire package is a Google Protocol-Buffer message definition.
+//Each message defines sensor data.
+
+//A generic 3d point with these conventions relative to the robot's local coordinates (unit - meters):
+//(0,1,0) points straight ahead
+//(1,0,0) points right
+//(0,0,1) points up
+message Point3
+{  //Default is (0,1,0)
+	optional float x = 1 [default = 0.0];
+	optional float y = 2 [default = 1.0];
+	optional float z = 3 [default = 0.0];
+}
+
+//Either Hokoyu or SICK laser scan
+message msg_LaserScan
+{
+	required float resolution = 1; //Degrees between each ray-cast
+	repeated float scan = 2; //The number of ray-casts and the value of each in meters.
+	//Presume that the scan starts on the left (x < 0.0)
+	//If odd number, presume the middle value is a ray-cast straight ahead. (0, 1, 0 )
+	//If even number, presume the two middle values are (resolution/2) to either side of straight ahead. (the first will have "x < 0.0" and the other "x > 0.0" )
+	optional Point3 offset = 3; //The offset of the laser scan relative to the robot's point of origin.
+	optional Point3 direction = 4; //The direction of the laser scan relative to the robot's point of origin.
+}
+
+//A generic GPS scan. Doesn't really need explanation.
+message msg_GPS
+{
+	required float latitude = 1;
+	required float longitude = 2;
+}
+
+
+
+
