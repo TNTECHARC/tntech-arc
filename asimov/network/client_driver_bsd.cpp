@@ -4,12 +4,8 @@
 #include <string>
 #include <iostream>
 
-bool callback( const std::string& packet )
+bool callback( std::string packet, int msg_type, int unique_id )
 {
-  int msg_type   = asimov::get_msg_type( packet );     //The type of packet this is ("asimov/messages/message_ids.h" holds the list) 
-  int msg_uid    = asimov::get_msg_unique_id( packet );//The client that sent this packet
-  int msg_length = asimov::get_msg_length( packet );   //The number of bytes the message is
-  std::string message = packet.substr( asimov::MESSAGE_HEADER_SIZE ); //The message absent the header
 
   return true; //Return true if successful parsing of this packet
 }
@@ -29,7 +25,7 @@ int main( int argc, char* argv[] )
   client.ReadFromCIN( true );
 
   char answer;
-  while( client.Connect( address, true ) == false )
+  while( client.Connect( address, false ) == false )
   { std::cout << "Try to connect again? (y)es or (n)o?   ";
     std::cin >> answer;
     if( answer == 'n' )

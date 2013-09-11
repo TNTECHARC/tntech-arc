@@ -2,8 +2,8 @@ all:
 	print "Google protobuf messages in this directory
 
 
-generate: communication.proto
-	protoc --cpp_out=. communication.proto
+generate: communication.proto sensors.proto
+	protoc --cpp_out=. --python_out=. communication.proto sensors.proto
 
 
 

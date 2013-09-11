@@ -8,7 +8,7 @@ BUFFER_SIZE = 1024
 
 #gets a tuple {msg_type, msg_len, msg_uid }
 def get_header( c_string ):
-	return [sockets.ntohl(i) for i in struct.unpack( '!lll', c_string )]
+	return struct.unpack( '!lll', c_string )
 
 #header creation
 def create_header( msg_type, msg_len, msg_uid ):

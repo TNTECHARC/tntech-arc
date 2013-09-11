@@ -6,7 +6,7 @@ namespace asimov
 
 
 
-ClientBSD::ClientBSD( std::function<bool(const std::string&)> callback ) //Set some default values.
+ClientBSD::ClientBSD( client_callback callback ) //Set some default values.
 { callback_ = callback;
   connected_ = false;
   port_ = PORT_NUMBER;
@@ -95,23 +95,23 @@ void ClientBSD::Disconnect() //Force disconnection
 }
 //Loops until timeout or a message has been received (which it returns).
 void ClientBSD::Listen()
-{ FD_ZERO( &send_set_ );
+{ FD_ZERO( &send_set_ ); //two bitmasks
   FD_ZERO( &recv_set_ );
-  if( use_cin_ )
+  if( use_cin_ ) //if read from cin, set bit 0
     FD_SET( 0, &recv_set_ );
   if( send_data_.size() > 0 )
-    FD_SET( socket_fd_, &send_set_ );
+    FD_SET( socket_fd_, &send_set_ );  //if data to send, set appropriate bit
   FD_SET( socket_fd_, &recv_set_ );
-  struct timeval timeout = select_timeout_;
+  struct timeval timeout = select_timeout_; //copy the timeout because it is modified
   int sel = select( socket_fd_+1, &recv_set_, &send_set_, NULL, 0 ); 
   if( sel > 0 )
   {
-    if( FD_ISSET( 0, &recv_set_ ) )
+    if( FD_ISSET( 0, &recv_set_ ) ) //If std::CIN
     { std::string line;
       std::getline( std::cin, line );
       ParseCommand( line );
     }
-    if( FD_ISSET( socket_fd_, &recv_set_ ) )
+    if( FD_ISSET( socket_fd_, &recv_set_ ) ) //if data received
     { int bytes_recv = recv( socket_fd_, buffer_, BUFFER_SIZE, 0 );
       if( bytes_recv <= 0 ) 
       { connected_ = false;
@@ -119,9 +119,9 @@ void ClientBSD::Listen()
         return; //exit gracefully
       }
       recv_data_.append( buffer_, bytes_recv );  //Yeah! valid data!
-      ParseString( recv_data_, 0 );
+      ParseString( );
     }//End recv_set_
-    if( FD_ISSET( socket_fd_, &send_set_ ) )
+    if( FD_ISSET( socket_fd_, &send_set_ ) ) //If data to send
     { int data_count = std::min( BUFFER_SIZE, int(send_data_.size()) ); //Fit as much into buffer as possible.
       send_data_.copy( buffer_, data_count );
       int bytes_sent = send( socket_fd_, buffer_, data_count, 0 );
@@ -156,7 +156,7 @@ void ClientBSD::ExecuteCommand( msg_Command& message )
   }
   std::cout << "\n";
 }
-void ClientBSD::ParseString( const std::string& message, int uid )
+void ClientBSD::ParseString( )
 { 
   if( recv_data_.size() < MESSAGE_HEADER_SIZE )
   { return; //too small to be a real message.
@@ -169,21 +169,22 @@ void ClientBSD::ParseString( const std::string& message, int uid )
   }
   else if( msg_type == msg_Command_ID )
   { msg_Command msg_cmd;
-    if( msg_cmd.ParseFromString( recv_data_.substr( MESSAGE_HEADER_SIZE ) ) )
+    if( msg_cmd.ParseFromString( recv_data_.substr( MESSAGE_HEADER_SIZE, msg_length ) ) )
     { ExecuteCommand( msg_cmd );
     }
   }
   else if( msg_type == msg_ServerAccept_ID )
   { msg_ServerAccept msg_accept;
-    if( msg_accept.ParseFromString( recv_data_.substr( MESSAGE_HEADER_SIZE ) ) )
+    if( msg_accept.ParseFromString( recv_data_.substr( MESSAGE_HEADER_SIZE, msg_length ) ) )
     { unique_id_ = msg_accept.unique_id();
+      std::cout << "unique id(" << unique_id_ << ")\n";
     }
   }
   else if( msg_type == msg_Echo_ID )
-  { std::cout << "echo(" << msg_uid << ") \"" << recv_data_.substr( MESSAGE_HEADER_SIZE ) << "\"" << std::endl;
+  { std::cout << "echo(" << msg_uid << ") \"" << recv_data_.substr( MESSAGE_HEADER_SIZE, msg_length ) << "\"" << std::endl;
   }
-  else if( callback_( message ) )
-  {
+  else if( callback_( recv_data_.substr( MESSAGE_HEADER_SIZE, msg_length ), msg_type, msg_uid ) )
+  { //The client callback
   }
   //And clear out the used data.
   recv_data_.erase( 0, msg_length + MESSAGE_HEADER_SIZE );

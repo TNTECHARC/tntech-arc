@@ -14,7 +14,6 @@ message msg_Command
                                  //then it matches each client with this name
   required string command = 3;    //The command to execute
   repeated string arguments = 4;   //Optional command line arguments
-  optional int32 type = 5 [default = 2];  //Every message has a type which may be converted to a char
 }
 
 //This is sent by the client to the server as a login msg
@@ -22,14 +21,12 @@ message msg_ClientLogin
 {
   required string name = 1;             //The generic name of this client (can be multiple client with same name)
   required string messages_accept = 2;  //A list of chars(message_types) that this client wishes to suscribe to
-  optional int32 type = 3 [default = 3];  //Every message has a type which may be converted to a char
 }
 
 //This is the message that the server returns to a client after a successful ClientLogin.
 message msg_ServerAccept
 {
   required uint32 unique_id = 1;  //Sends the client's unique_id.
-  optional int32 type = 2 [default = 4];  //Every message has a type which may be converted to a char
 }
 
 

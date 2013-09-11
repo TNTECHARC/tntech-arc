@@ -5,9 +5,13 @@
 #include "messages/message_ids.h"
 
 #include <string>
+#include <functional>
 
 namespace asimov
 {
+
+//(message, msg type, uid of sender)
+typedef std::function<bool( std::string, int, int )> client_callback;
 
 class ClientInterface : public  CommandInterface
 {
