@@ -17,15 +17,13 @@ message Point3
 	optional float z = 3 [default = 0.0];
 }
 
-//Either Hokoyu or SICK laser scan
+//Either Hokoyu or SICK laser scan in Polor Coords
 message msg_LaserScan
 {
-	required float resolution = 1; //Degrees between each ray-cast.
-	repeated float scan = 2;       //The number of ray-casts and the value of each in meters.
-	required float startDegree = 3;//To the left of straight ahead.
-	required float endDegree = 4;  //To the right of straight ahead.
-	optional Point3 offset = 5;    //The offset of the laser scan relative to the robot's point of origin.
-	optional Point3 direction = 6; //The direction of the laser scan relative to the robot's point of origin.
+	repeated float angles = 1;      //The number of angles and the values corresponding to each scan value
+	repeated float scan   = 2;       //The number of ray-casts and the value of each in meters.
+	optional Point3 offset = 3;    //The offset of the laser scan relative to the robot's point of origin.
+	optional Point3 direction = 4; //The direction of the laser scan relative to the robot's point of origin.
 }
 
 //A generic GPS scan. Doesn't really need explanation.

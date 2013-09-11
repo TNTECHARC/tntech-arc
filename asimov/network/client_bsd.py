@@ -43,14 +43,17 @@ class client_bsd:
 				self.sock_fd_.connect( constants.UNIX_SOCKET )
 				self.connected_ = True
 				self.sock_fd_.setblocking( 0 )
+				print "Connected to server"
 				return True
 			else:  #ipv4
 				self.sock_fd_ = socket.socket( socket.AF_INET, socket.SOCK_STREAM )
 				self.sock_fd_.connect( (address, int(constants.PORT_NUMBER) ) )
 				self.connected_ = True
 				self.sock_fd_.setblocking( 0 )
+				print "Connected to server"
 				return True
 		except:
+			print "Connection failed"
 			self.connected_ = False
 			return False
 	def write( self, msg_type, data ):

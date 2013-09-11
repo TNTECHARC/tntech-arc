@@ -120,7 +120,7 @@ void ServerBSD::Accept_UNIX()
     acceptance.set_unique_id( conn.get_unique_id() );
     std::string message;
     acceptance.SerializeToString( &message );
-    message.insert( 0, get_header( acceptance.type(), message.size(), 0 ) );
+    message.insert( 0, get_header( msg_ServerAccept_ID, message.size(), 0 ) );
     connections_.back().Write( message ); //Send the message to ONLY this client.
   }
 }
@@ -144,7 +144,7 @@ void ServerBSD::Accept_INET()
     acceptance.set_unique_id( conn.get_unique_id() );
     std::string message;
     acceptance.SerializeToString( &message );
-    message.insert( 0, get_header( acceptance.type(), message.size(), 0 ) );
+    message.insert( 0, get_header( msg_ServerAccept_ID, message.size(), 0 ) );
     connections_.back().Write( message ); //Send the message to ONLY this client.
   }
   else

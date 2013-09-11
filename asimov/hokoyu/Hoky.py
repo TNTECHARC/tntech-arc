@@ -13,6 +13,7 @@ class Hoky(object):
         self.s.write('BM\n')
         self.s.read(8)
 
+
     def getAllLines(self):
         line = []
         keepGoing = True
