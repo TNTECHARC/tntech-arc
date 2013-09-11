@@ -4,9 +4,19 @@
 #include <string>
 #include <iostream>
 
+bool callback( const std::string& packet )
+{
+  int msg_type   = asimov::get_msg_type( packet );     //The type of packet this is ("asimov/messages/message_ids.h" holds the list) 
+  int msg_uid    = asimov::get_msg_unique_id( packet );//The client that sent this packet
+  int msg_length = asimov::get_msg_length( packet );   //The number of bytes the message is
+  std::string message = packet.substr( asimov::MESSAGE_HEADER_SIZE ); //The message absent the header
+
+  return true; //Return true if successful parsing of this packet
+}
+
 int main( int argc, char* argv[] )
 {
-  asimov::ClientBSD client;
+  asimov::ClientBSD client( &callback );
   std::string address = "127.0.0.1";
   std::string message_prefs = "";
   message_prefs.append(1, char(asimov::msg_Command_ID ) );

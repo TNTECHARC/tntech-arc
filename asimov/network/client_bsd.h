@@ -12,6 +12,7 @@
 #include "netdb.h"
 #include <algorithm>
 #include <iostream>
+#include <functional>
 
 #include "network/client_interface.h"
 #include "network/message_header_bsd.h"
@@ -23,7 +24,7 @@ namespace asimov
 class ClientBSD: public ClientInterface
 {
 public:
-  ClientBSD(); //Set some default values.
+  ClientBSD( std::function<bool(const std::string&)> callback = [](const std::string& x){ return false;} ); //Set some default values.
 //IPv4 address and the port. (If 127.0.0.1 and BSD then use AF_UNIX)
   virtual bool Connect( std::string address, bool force_inet = false );
   virtual void Disconnect(); //Force disconnection
@@ -67,6 +68,7 @@ private:
   int socket_fd_;  //The socket file descriptor
   fd_set send_set_;  //For select
   fd_set recv_set_;  //For select
+  std::function<bool(std::string)> callback_; //This returns true only if it processed the message successfully.
 };
 
 

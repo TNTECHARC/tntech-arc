@@ -27,6 +27,7 @@ public:
   virtual void set_keepalive( int microseconds ) = 0; //The time between each keepalive message
   virtual void set_message_prefs( std::string prefs ) = 0; //A list of message types.
   virtual void set_name( std::string name ) = 0; //A generic name that this will be called by.
+
 };
 
 

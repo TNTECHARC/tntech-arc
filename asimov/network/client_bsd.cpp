@@ -6,8 +6,8 @@ namespace asimov
 
 
 
-ClientBSD::ClientBSD() //Set some default values.
-{
+ClientBSD::ClientBSD( std::function<bool(const std::string&)> callback ) //Set some default values.
+{ callback_ = callback;
   connected_ = false;
   port_ = PORT_NUMBER;
   //Localhost is default.
@@ -181,6 +181,9 @@ void ClientBSD::ParseString( const std::string& message, int uid )
   }
   else if( msg_type == msg_Echo_ID )
   { std::cout << "echo(" << msg_uid << ") \"" << recv_data_.substr( MESSAGE_HEADER_SIZE ) << "\"" << std::endl;
+  }
+  else if( callback_( message ) )
+  {
   }
   //And clear out the used data.
   recv_data_.erase( 0, msg_length + MESSAGE_HEADER_SIZE );
