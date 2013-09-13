@@ -168,6 +168,6 @@ if __name__ == '__main__':
     #graph()
     h = Hoky(port='/dev/ttyACM0')
     #timeIt(h)
-    plotCartesian(h)
-    #plotRadar(h)
+    #plotCartesian(h)
+    plotRadar(h)
 

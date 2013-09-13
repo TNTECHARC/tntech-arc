@@ -41,3 +41,9 @@ run_client_bsd:
 	./ClientBSD
 run_server_bsd:
 	./ServerBSD
+run_hokoyu_client:
+	python hokoyu/client_hokoyu.py
+run_obstacle_avoidance:
+	python lidar/obstacle.py
+
+

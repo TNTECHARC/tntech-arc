@@ -227,6 +227,8 @@ void ServerBSD::ParseString( const std::string& message, int uid )
 { int unique_id = uid;
   int msg_len   = get_msg_length( message );
   int msg_type  = get_msg_type( message );
+  
+  std::cout << "msg type(" << msg_type << ")  msg length(" << msg_len << ")  unique id(" << unique_id << ")\n";
   //If this msg_type is of "msg_Command" then...
   if( msg_type == msg_Command_ID )
   { //This is a command message. Check to see if server is a match.

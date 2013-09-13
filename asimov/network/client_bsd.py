@@ -56,6 +56,9 @@ class client_bsd:
 			print "Connection failed"
 			self.connected_ = False
 			return False
+	#returns the size of the send buffer.
+	def buffer_size( self ):
+		return len( self.send_data_ )
 	def write( self, msg_type, data ):
 		self.send_data_ += constants.create_header( msg_type, len(data), self.unique_id_ ) 
 		self.send_data_ += data
@@ -74,7 +77,7 @@ class client_bsd:
 				if data:
 					self.recv_data_ += data
 					if len(data) >= constants.MESSAGE_HEADER_SIZE:
-						header = constants.get_header( data[:constants.MESSAGE_HEADER_SIZE] )
+						header = constants.get_header( self.recv_data_[:constants.MESSAGE_HEADER_SIZE] )
 						self.parse_message( header )
 				else:
 					print "inputready error"
@@ -101,8 +104,12 @@ class client_bsd:
 		msg_type      = header[0]
 		msg_unique_id = header[2]
 		msg_hd_sz     = constants.MESSAGE_HEADER_SIZE
-		
-		if msg_type == message_ids.msg_Empty or msg_length + constants.MESSAGE_HEADER_SIZE > len(self.recv_data_):
+		#print "length",msg_length,"  type", msg_type,"  uid", msg_unique_id	
+	
+
+		if msg_length + constants.MESSAGE_HEADER_SIZE > len(self.recv_data_):
+			return False
+		elif msg_type == message_ids.msg_Empty:
 			pass
 		elif msg_type == message_ids.msg_ServerAccept_ID:
 			parser = communication_pb2.msg_ServerAccept()
