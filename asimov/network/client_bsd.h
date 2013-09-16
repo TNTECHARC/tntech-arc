@@ -24,7 +24,7 @@ namespace asimov
 class ClientBSD: public ClientInterface
 {
 public:
-  ClientBSD( client_callback = [](const std::string& x){ return false;} ); //Set some default values.
+  ClientBSD( client_callback = [](std::string x, int msg_type, int msg_uid){ return false;} ); //Set some default values.
 //IPv4 address and the port. (If 127.0.0.1 and BSD then use AF_UNIX)
   virtual bool Connect( std::string address, bool force_inet = false );
   virtual void Disconnect(); //Force disconnection
@@ -47,8 +47,9 @@ public:
   virtual bool has_message();  //Is there a complete message in the queue?
   virtual std::string get_message(); //Returns data retrieved by listen()
   virtual void set_keepalive( int microseconds ); //The time between each keepalive message
-  virtual void set_message_prefs( std::string prefs ); //A list of message types.
+  virtual void add_message_pref( int message_id ); //A list of message types.
   virtual void set_name( std::string name ); //A generic name that this will be called by.
+  virtual int  buffer_size(); //The amount of data ready to send
 
 private:
   bool connected_;  //Kinda obvious here.

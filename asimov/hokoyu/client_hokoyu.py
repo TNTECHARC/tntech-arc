@@ -40,7 +40,7 @@ class hokoyu_client:
 				polar_coords = self.hokoyu_.getPolarCoords()
 				#for each pair of values, check validity.
 				for i in range( len( polar_coords[0] ) ):
-					if polar_coords[0][i] > 0.0 and polar_coords[0][i] < 3.14159:
+					if polar_coords[0][i] >= 0.0 and polar_coords[0][i] <= 3.14159:
 						self.laserscan_.angles.append( polar_coords[0][i] )
 						self.laserscan_.scan.append(   polar_coords[1][i] )
 				#write the laserscan to the send buffer

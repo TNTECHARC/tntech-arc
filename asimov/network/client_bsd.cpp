@@ -14,7 +14,7 @@ ClientBSD::ClientBSD( client_callback callback ) //Set some default values.
   address_ = "127.0.0.1";
   //One second is the default timeout.
   select_timeout_.tv_sec = 1;
-  select_timeout_.tv_usec = 1;
+  select_timeout_.tv_usec = 0;
   use_cin_ = false;
   memset( &sock_un_, 0, sizeof( sock_un_ ) );
   memset( &sock_in_, 0, sizeof( sock_in_ ) );
@@ -103,7 +103,7 @@ void ClientBSD::Listen()
     FD_SET( socket_fd_, &send_set_ );  //if data to send, set appropriate bit
   FD_SET( socket_fd_, &recv_set_ );
   struct timeval timeout = select_timeout_; //copy the timeout because it is modified
-  int sel = select( socket_fd_+1, &recv_set_, &send_set_, NULL, 0 ); 
+  int sel = select( socket_fd_+1, &recv_set_, &send_set_, NULL, &timeout ); 
   if( sel > 0 )
   {
     if( FD_ISSET( 0, &recv_set_ ) ) //If std::CIN
@@ -201,7 +201,9 @@ void ClientBSD::ParseCommand( const std::string& cmd_line )
   { Write( cmd_line.substr( 5, cmd_line.size()-5 ), msg_Echo_ID );
   }
 }
-
+int ClientBSD::buffer_size()
+{ return send_data_.size();
+}
 
 ClientBSD::~ClientBSD()
 {
@@ -221,8 +223,8 @@ void ClientBSD::set_keepalive( int microseconds ) //The time between each keepal
   select_timeout_.tv_sec  = microseconds / million;
   select_timeout_.tv_usec = microseconds % million;
 }
-void ClientBSD::set_message_prefs( std::string prefs ) //A list of message types.
-{ message_prefs_ = prefs;
+void ClientBSD::add_message_pref( int message_id ) //A list of message types.
+{ message_prefs_.append( 1, char( message_id ) );
 }
 void ClientBSD::set_name( std::string name ) //A generic name that this will be called by.
 { name_ = name;

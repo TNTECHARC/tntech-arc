@@ -56,7 +56,6 @@ class Hoky(object):
             prev = curr
 
         scanDecoded.append(curr)
-
         # LATER: implement two pass algorithm discussed here:
         # http://tntechigvc.wikidot.com/forum/t-185605/programming-to-do-list#post-791386
         return np.array(scanDecoded[1:])
@@ -67,7 +66,7 @@ class Hoky(object):
             print 'ERROR: NO SCAN!!'
             sys.exit(0)
             return
-
+	print len(scan)
         resTheta = (240. / len(scan))/180. * 3.141592
         thetaList = np.arange(len(scan))*resTheta-np.pi/6
         return thetaList, scan

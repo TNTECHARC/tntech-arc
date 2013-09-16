@@ -25,11 +25,12 @@ public:
   virtual bool Write( const std::string& msg, int type ) = 0;
 
 public:
+  virtual int  buffer_size() = 0; //Data in send buffer.
   virtual bool is_connected() = 0; //Returns true if valid connection
   virtual bool has_message() = 0;  //Is there a complete message in the queue?
   virtual std::string get_message() = 0; //Returns same data as Listen()
   virtual void set_keepalive( int microseconds ) = 0; //The time between each keepalive message
-  virtual void set_message_prefs( std::string prefs ) = 0; //A list of message types.
+  virtual void add_message_pref( int message_id ) = 0; //Add a message type to ask for.
   virtual void set_name( std::string name ) = 0; //A generic name that this will be called by.
 
 };
