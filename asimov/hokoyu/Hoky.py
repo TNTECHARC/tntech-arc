@@ -68,6 +68,7 @@ class Hoky(object):
             return
 	print len(scan)
         resTheta = (240. / len(scan))/180. * 3.141592
+	print resTheta
         thetaList = np.arange(len(scan))*resTheta-np.pi/6
         return thetaList, scan
 

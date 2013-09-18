@@ -7,6 +7,7 @@
 #include <string>
 #include <string.h>
 #include <algorithm>
+#include <vector>
 
 #include "messages/sensors.pb.h"
 #include "messages/message_ids.h"
@@ -25,6 +26,12 @@ void open_device( char* device ); //Opens the device
 void get_all_lines( std::string& buffer );
 void get_laser_scan( asimov::msg_LaserScan& lidar_scan );
 
+//#########################################################
+//Daniel Oliver
+//Last modified: September 10, 2013
+//Description:  A straight copy of Hoky.py except with a 
+//    server connection.
+//#########################################################
 int main( int argc, char* argv[] )
 {
   printf( "Parameters: optional(device_name), optional(server address)\n" );
@@ -72,16 +79,16 @@ int main( int argc, char* argv[] )
 //#########################################################
 void open_device( char* device )
 {
-  file_desc = open( device, O_RDWR | O_NOCTTY );
+  file_desc = open( device, O_RDWR | O_NOCTTY ); //Create pseudo-socket. Valid values are greater than 0.
   if( file_desc < 0) { printf( "Unable to connect to device.\n" ); exit( 0 ); } 
   tcgetattr( file_desc, &old_tio ); //Save current settings of serial port.
-  memset( &new_tio, 0, sizeof(new_tio) );
-  new_tio.c_cflag = B19200 | CRTSCTS | CS8 | CLOCAL | CREAD;
-  new_tio.c_iflag = IGNPAR | ICRNL;
-  new_tio.c_oflag = 0;
-  new_tio.c_lflag = ICANON;
-  tcflush( file_desc, TCIFLUSH );
-  tcsetattr( file_desc, TCSANOW, &new_tio );
+  memset( &new_tio, 0, sizeof(new_tio) ); //Blank out new settings
+  new_tio.c_cflag = B19200 | CRTSCTS | CS8 | CLOCAL | CREAD; //19200Baudrate. 8bit bytes. Local connection. May read.
+  new_tio.c_iflag = IGNPAR | ICRNL; //Ignore Parity.
+  new_tio.c_oflag = 0;   
+  new_tio.c_lflag = ICANON; //Canonical
+  tcflush( file_desc, TCIFLUSH ); //Flush the port buffer.
+  tcsetattr( file_desc, TCSANOW, &new_tio );  //Give the new settings
   strncpy( buffer, "BM\n", buffer_size ); //Init message 
   int count = write( file_desc, buffer, strlen(buffer) ); //returns bytes sent.
   if( count < 3 ) { printf( "Unable to connect to device.\n" ); exit( 0 ); }
@@ -90,7 +97,11 @@ void open_device( char* device )
 }
 //#########################################################
 void get_all_lines( std::string& lines )
-{
+{ //Read the buffer while the pattern doesn't match:
+  //Line 0: command echo.
+  //Line 1: device status
+  //Line 2: timestamp
+  //Line 3-N: data
   lines.clear();
   while( lines.find( command ) != 0 )
   { 
@@ -127,6 +138,7 @@ void get_laser_scan( asimov::msg_LaserScan& lidar_scan  )
   int prev = 20;
   int curr = 20;
   //printf( "%s\n", line_buffer.c_str() );
+  std::vector< float > ranges;
   for( int i = 0; i < line_buffer.size()-3; i = i + 3 )
   { sv0 = line_buffer[ i + 0 ] - 48;
     sv1 = line_buffer[ i + 1 ] - 48;
@@ -134,17 +146,22 @@ void get_laser_scan( asimov::msg_LaserScan& lidar_scan  )
     curr = (sv0<<12)+(sv1<<6)+sv2;
     if( curr <= 20 )
       curr = prev;
-    if( i > 0 ) 
-     lidar_scan.add_scan( float(prev)/1000.0 );
+    ranges.push_back( float(prev)/1000.0 );
     prev = curr;
   }
-  lidar_scan.add_scan( float(curr)/1000.0 ); 
+  ranges.push_back( float(curr)/1000.0 ); 
+  ranges.erase( ranges.begin() );
   //Add polar coordinates
-  int scan_size = lidar_scan.scan_size();
+  int scan_size = ranges.size();
   float PI = 3.141592;
   float resTheta = 240.0 / float(scan_size) / 180.0 * PI;
+  float angle;
   for( int i = 0; i < scan_size; i++ )
-  { lidar_scan.add_angles( resTheta * i - PI/6.0 );
+  { angle = resTheta * i - PI/6.0;
+    if( angle > 0.0 && angle <= PI )
+    { lidar_scan.add_ranges( ranges[i] );
+      lidar_scan.add_angles( resTheta * i - PI/6.0 );
+    }
   }
 }
 //#########################################################

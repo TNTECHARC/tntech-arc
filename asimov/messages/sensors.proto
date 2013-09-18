@@ -9,8 +9,8 @@ package asimov;
 //Either Hokoyu or SICK laser scan in Polor Coords
 message msg_LaserScan
 {
-	repeated float angles = 1;      //The number of angles and the values corresponding to each scan value
-	repeated float scan   = 2;       //The number of ray-casts and the value of each in meters.
+	repeated float angles = 1;    //The number of angles and the values corresponding to each scan value
+	repeated float ranges = 2;    //The number of ray-casts and the value of each in meters.
 }
 
 //A generic GPS scan. Doesn't really need explanation.

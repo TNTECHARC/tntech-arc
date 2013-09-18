@@ -42,7 +42,7 @@ class hokoyu_client:
 				for i in range( len( polar_coords[0] ) ):
 					if polar_coords[0][i] >= 0.0 and polar_coords[0][i] <= 3.14159:
 						self.laserscan_.angles.append( polar_coords[0][i] )
-						self.laserscan_.scan.append(   polar_coords[1][i] )
+						self.laserscan_.ranges.append(   polar_coords[1][i] )
 				#write the laserscan to the send buffer
 				self.client_.write( message_ids.msg_LaserScan_ID, self.laserscan_.SerializeToString() )
 		#close the hardware driver
