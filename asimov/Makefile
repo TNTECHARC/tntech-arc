@@ -47,17 +47,17 @@ generate_protoc: messages/Makefile
 
 
 #run files
-run_hoky_driver:
-	./Hoky_driver
+run_hoky_driver:  
+	./Hoky_driver #hardware
 run_lidar_driver:
-	./Lidar_driver
+	./Lidar_driver #processing
 run_client_bsd:
-	./ClientBSD
-run_server_bsd:
-	./ServerBSD
+	./ClientBSD  #echo client
+run_server_bsd: 
+	./ServerBSD  #data server
 run_hokoyu_client:
-	python hokoyu/client_hokoyu.py
+	python hokoyu/client_hokoyu.py  #
 run_obstacle_avoidance:
-	python lidar/obstacle.py
+	python lidar/obstacle.py  #obstacle avoidance
 
 
