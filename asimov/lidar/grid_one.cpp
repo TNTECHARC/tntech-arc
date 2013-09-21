@@ -56,7 +56,16 @@ public:
             y = (int) (sqrt(r2 - x*x));
             set_cell(gridX + x, gridY + y, 9999);
             set_cell(gridX + x, gridY - y, 9999);
-            set_cell(gridX + x, gridY + y - 1, 9999); //CORRECTS EMPTY CELLS
+            set_cell(gridX + x, gridY + y - 1, 9999);
+            set_cell(gridX + x, gridY - y + 1, 9999);
+        }
+        radius--;
+        r2 = radius * radius;
+        for(x = -radius; x <= radius; x++){
+            y = (int) (sqrt(r2 - x*x));
+            set_cell(gridX + x, gridY + y, 9999);
+            set_cell(gridX + x, gridY - y, 9999);
+            set_cell(gridX + x, gridY + y - 1, 9999);
             set_cell(gridX + x, gridY - y + 1, 9999);
         }
     }
@@ -68,21 +77,55 @@ public:
         }
 
     }
-    void compare_cell(int i) //RECURSIVE FN THAT SETS ELEMENTS OF PATH_ TO TRUE BASED ON WEIGHTING OF GRID_
+    void compare_cell(int i, int iteration) //RECURSIVE FN THAT SETS ELEMENTS OF PATH_ TO TRUE BASED ON WEIGHTING OF GRID_
     {
-        int min,a,b,c,d,e,f,g,h,next,last;
+        int min,a,b,c,d,e,f,g,h,next,last,iteration_;
+        iteration_ = iteration;
         last = i;
-        a = grid_[i - 1];       //STORES WEIGHTS OF NEARBY CELLS STARTING FROM LEFT
-        b = grid_[i + size_ - 1];
-        c = grid_[i + size_];
-        d = grid_[i + size_ + 1];
-        e = grid_[i + 1];
-        f = grid_[i + 1 - size_];
-        g = grid_[i - size_];
-        h = grid_[i - size_ - 1];
+           //STORES WEIGHTS OF NEARBY CELLS STARTING FROM LEFT
+        if(i - 1 >=0)
+        {
+            a = grid_[i - 1];
+        }
+        else{ a = 9000;}
+        if(i + size_ - 1 <= size_ * size_)
+        {
+            b = grid_[i + size_ - 1];
+        }
+        else{b = 9000;}
+        if(i + size_ <= size_ * size_)
+        {
+            c = grid_[i + size_];
+        }
+        else{c = 9000;}
+        if(i + size_ + 1 <= size_ * size_)
+        {
+            d = grid_[i + size_ + 1];
+        }
+        else{d = 9000;}
+        if(i + 1 <= size_ * size_)
+        {
+            e = grid_[i + 1];
+        }
+        else{e = 9000;}
+        if(i + 1 - size_ >= 0)
+        {
+            f = grid_[i - size_ + 1];
+        }
+        else{ f = 9000;}
+        if(i - size_ >= 0)
+        {
+            g = grid_[i - size_];
+        }
+        else{g = 9000;}
+        if(i - size_ - 1 >= 0)
+        {
+            h = grid_[i - size_ - 1];
+        }
+        else{h = 9000;}
 
-        if( a < b){ min = a;} //SETS MIN TO LOWEST ELEMENT OF GRID_
-        else{ min = b;}
+        min = a;    //SETS MIN TO LOWEST ELEMENT OF GRID_
+        if( min > b){min = b;}
         if( min > c){min = c;}
         if( min > d){min = d;}
         if( min > e){min = e;}
@@ -90,6 +133,7 @@ public:
         if( min > g){min = g;}
         if( min > h){min = h;}
 
+        next = 0;
         if(min==a){next = i -1;}    //SETS NEXT TO THE 1D ADDRESS OF MIN
         if(min==b){next = i + size_ - 1;}
         if(min==c){next = i + size_;}
@@ -100,12 +144,22 @@ public:
         if(min==h){next = i + -size_ - 1;}
         if(min==0){next = 0;}
 
-        grid_[last]++; //LESSENS LIKELYHOOD OF BACKTRACKING
+        grid_[last] += 10; //LESSENS LIKELYHOOD OF BACKTRACKING
 
-        if(next != 0) //IF NEXT CELL ISNT DESTINATION
+        if(next != 0 && iteration_ < 500) //IF NEXT CELL ISNT DESTINATION
         {
-            path_[next] = true; //SETS ELEMENT OF PATH GRID SIMILAR TO grid_ TO PATHED
-            compare_cell(next); //PROCESSES NEXT POINT
+            if(path_[next] != true) //IF NOT BACKTRACKING
+            {
+                path_[next] = true; //SETS ELEMENT OF PATH GRID SIMILAR TO grid_ TO PATHED
+            }
+            else
+            {
+                grid_[next] += 10; //IF BACKTRACKING REDUCE CHANCE OF REVISITING
+                path_[next] = false; // CLEAR BACKTRACKED PATH
+            }
+
+            iteration_++;
+            compare_cell(next, iteration_); //PROCESSES NEXT POINT
         }
         else
         {
@@ -120,18 +174,20 @@ public:
             for( int j = 0; j < size_; j++)
             {   if(path_[get_i(j,i)] == true)
                 {
-                    std::cout << "@";
+                    std::cout << "!";
                 }
                 else
                 {
                     if(grid_[get_i(j,i)] != 9999 && grid_[get_i(j,i)] > 1 )
-                    {
+                    {   /*
                         int c = grid_[get_i(j,i)];
                         while( c >= 10)
                         {
                             c /= 10;
                         }
                         std::cout << c;
+                        */
+                        std::cout << ".";
                         }
                     else if( grid_[get_i(j,i)] == 9999 )
                     {
@@ -163,8 +219,6 @@ int main(){
 
     grid_one.weight_cell(size_,destX,destY);
 
-    //grid_one.compare_cell(50); //STARTS LISTING PATHS IN path_ STARTING AT i = 50. **NEEDS DEBUGGED**
-
     for( int i = 0; i < 50; i++ )  //MAIN LOOP THROUGH LIDARS ANGLE RANGE
       {
         //float x = cos( theta[i]) * r[i];    //POLAR TO CARTESIAN CONVERSION
@@ -173,6 +227,8 @@ int main(){
         float y = (rand() % 100) * 0.03;
         grid_one.pad_path( CartPoint( x, y ), 8);
       }
+
+    grid_one.compare_cell(50,0); //STARTS LISTING PATHS IN path_ STARTING AT i = 50. **NEEDS DEBUGGED**
 
     grid_one.print();   //TEST DATA DEBUG OUTPUT
 
