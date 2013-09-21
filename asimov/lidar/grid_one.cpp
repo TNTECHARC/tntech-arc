@@ -1,4 +1,4 @@
-//TTUARC 9/22/13 LIDAR GRID PROGRAM
+//TTUARC 9/21/13 LIDAR GRID PROGRAM
 //POORLY SIMULATES LIDAR DATA, PLOTS DATA AS CIRCLES TO GRID TO DENOTE OBSTACLES
 //WEIGHTS GRID ACCORDING TO DISTANCE FROM DESTINATION DETERMINED BY DIRECTION
 //MAKES PATH ALONG GRID CELLS TO DESTINATION
@@ -61,8 +61,12 @@ public:
         }
     }
 
-    void weight_cell(int index, int xf, int yf){ //WEIGHTS THE GRID ACCORDING TO A GRID LOCATION
-        grid_[index] = abs(xf - (index % size_)) + abs(yf - (index / size_));
+    void weight_cell(int sizeX, int xf, int yf){ //WEIGHTS THE GRID ACCORDING TO A GRID LOCATION
+        for(int i = 0; i < sizeX * sizeX; i++)
+        {
+            grid_[i] = abs(xf - (i % size_)) + abs(yf - (i / size_));
+        }
+
     }
     void compare_cell(int i) //RECURSIVE FN THAT SETS ELEMENTS OF PATH_ TO TRUE BASED ON WEIGHTING OF GRID_
     {
@@ -111,39 +115,30 @@ public:
 
     void print() //DEBUG PRINTOUT
     {
-        for( int i = size_ - 1; i >= 0; i--) //PATHING PRINTOUT
+        for( int i = size_ - 1; i >= 0; i--)
         {
             for( int j = 0; j < size_; j++)
-            {
-                if(path_[get_i(j,i)] == true)
+            {   if(path_[get_i(j,i)] == true)
                 {
                     std::cout << "@";
                 }
                 else
                 {
-                    std::cout << ".";
-                }
-            }
-            std::cout << "\n";
-        }
-        for( int i = size_ - 1; i >= 0; i--) //WEIGHTING PRINTOUT
-        {
-            for( int j = 0; j < size_; j++)
-            {
-                if(grid_[get_i(j,i)] != 9999 && grid_[get_i(j,i)] > 1 )
-                {
-                    int c = grid_[get_i(j,i)];
-                    while( c >= 10)
+                    if(grid_[get_i(j,i)] != 9999 && grid_[get_i(j,i)] > 1 )
                     {
-                        c /= 10;
+                        int c = grid_[get_i(j,i)];
+                        while( c >= 10)
+                        {
+                            c /= 10;
+                        }
+                        std::cout << c;
+                        }
+                    else if( grid_[get_i(j,i)] == 9999 )
+                    {
+                        std::cout << "#";
                     }
-                    std::cout << c;
-                    }
-                else if( grid_[get_i(j,i)] == 9999 )
-                {
-                    std::cout << "#";
+                    else{ std::cout << 0;}
                 }
-                else{ std::cout << 0;}
             }
             std::cout << "\n";
         }
@@ -157,8 +152,6 @@ int main(){
     //float theta[100];
     //float r[100];
     int size_ = 100;
-    int size_2 = size_ * size_;
-
     float dir = -25;    //DIRECTION OF WAYPOINT
     float dirRad = -1 * (dir + 270) * 0.0174532925; //CONVERT TO RADIANS, ADJUST QUADRANT
     int destX = 50 + (size_ * cos(dirRad)); //START FROM CENTER OF X AXIS RATHER THAN 0
@@ -168,11 +161,9 @@ int main(){
     if(destY < 0){destY = 0;}
     if(destY > 100){destY = 100;}
 
-    for(int i = 0; i < size_2; i++){
-        grid_one.weight_cell(i, destX, destY);
-    }
+    grid_one.weight_cell(size_,destX,destY);
 
-    grid_one.compare_cell(50); //STARTS LISTING PATHS IN path_ STARTING AT i = 50. **NEEDS DEBUGGED**
+    //grid_one.compare_cell(50); //STARTS LISTING PATHS IN path_ STARTING AT i = 50. **NEEDS DEBUGGED**
 
     for( int i = 0; i < 50; i++ )  //MAIN LOOP THROUGH LIDARS ANGLE RANGE
       {
