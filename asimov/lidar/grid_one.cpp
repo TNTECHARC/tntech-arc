@@ -53,27 +53,25 @@ public:
         int x, y, r2;
         r2 = radius * radius;
         for (x = -radius; x <= radius; x++) {
-            y = (int) (sqrt(r2 - x*x));
+            y = (int) (sqrt(r2 - x*x) + 0.5);
             set_cell(gridX + x, gridY + y, 9999);
             set_cell(gridX + x, gridY - y, 9999);
             set_cell(gridX + x, gridY + y - 1, 9999);
             set_cell(gridX + x, gridY - y + 1, 9999);
         }
-        radius--;
-        r2 = radius * radius;
-        for(x = -radius; x <= radius; x++){
-            y = (int) (sqrt(r2 - x*x));
+        for(y = -radius; y <= radius; y++){
+            x = (int) (sqrt(r2 - y*y) - 0.5);
             set_cell(gridX + x, gridY + y, 9999);
-            set_cell(gridX + x, gridY - y, 9999);
-            set_cell(gridX + x, gridY + y - 1, 9999);
-            set_cell(gridX + x, gridY - y + 1, 9999);
+            set_cell(gridX - x, gridY + y, 9999);
+            set_cell(gridX + x - 1, gridY + y, 9999);
+            set_cell(gridX - x + 1, gridY + y, 9999);
         }
     }
 
     void weight_cell(int sizeX, int xf, int yf){ //WEIGHTS THE GRID ACCORDING TO A GRID LOCATION
         for(int i = 0; i < sizeX * sizeX; i++)
         {
-            grid_[i] = abs(xf - (i % size_)) + abs(yf - (i / size_));
+            grid_[i] = sqrt(pow(xf - (i % size_), 2) + pow(yf - (i / size_), 2));
         }
 
     }
@@ -83,12 +81,12 @@ public:
         iteration_ = iteration;
         last = i;
            //STORES WEIGHTS OF NEARBY CELLS STARTING FROM LEFT
-        if(i - 1 >=0)
+        if(i - 1 >=0 && (i - 1) % size_ != size_ - 1)
         {
             a = grid_[i - 1];
         }
         else{ a = 9000;}
-        if(i + size_ - 1 <= size_ * size_)
+        if(i + size_ - 1 <= size_ * size_ && (i - 1) % size_ != size_ - 1)
         {
             b = grid_[i + size_ - 1];
         }
@@ -98,17 +96,17 @@ public:
             c = grid_[i + size_];
         }
         else{c = 9000;}
-        if(i + size_ + 1 <= size_ * size_)
+        if(i + size_ + 1 <= size_ * size_ && (i + 1) % size_ != 0)
         {
             d = grid_[i + size_ + 1];
         }
         else{d = 9000;}
-        if(i + 1 <= size_ * size_)
+        if(i + 1 <= size_ * size_ && (i + 1) % size_ != 0)
         {
             e = grid_[i + 1];
         }
         else{e = 9000;}
-        if(i + 1 - size_ >= 0)
+        if(i + 1 - size_ >= 0 && (i + 1) % size_ != 0)
         {
             f = grid_[i - size_ + 1];
         }
@@ -118,7 +116,7 @@ public:
             g = grid_[i - size_];
         }
         else{g = 9000;}
-        if(i - size_ - 1 >= 0)
+        if(i - size_ - 1 >= 0 && (i - 1) % size_ != size_ - 1)
         {
             h = grid_[i - size_ - 1];
         }
@@ -144,9 +142,9 @@ public:
         if(min==h){next = i + -size_ - 1;}
         if(min==0){next = 0;}
 
-        grid_[last] += 10; //LESSENS LIKELYHOOD OF BACKTRACKING
+        grid_[last] += 100; //LESSENS LIKELYHOOD OF BACKTRACKING
 
-        if(next != 0 && iteration_ < 500) //IF NEXT CELL ISNT DESTINATION
+        if(next != 0 && iteration_ < 1000) //IF NEXT CELL ISNT DESTINATION
         {
             if(path_[next] != true) //IF NOT BACKTRACKING
             {
@@ -154,7 +152,7 @@ public:
             }
             else
             {
-                grid_[next] += 10; //IF BACKTRACKING REDUCE CHANCE OF REVISITING
+                grid_[next] += 100; //IF BACKTRACKING REDUCE CHANCE OF REVISITING
                 path_[next] = false; // CLEAR BACKTRACKED PATH
             }
 
@@ -179,14 +177,14 @@ public:
                 else
                 {
                     if(grid_[get_i(j,i)] != 9999 && grid_[get_i(j,i)] > 1 )
-                    {   /*
-                        int c = grid_[get_i(j,i)];
+                    {
+                        /* int c = grid_[get_i(j,i)];
                         while( c >= 10)
                         {
                             c /= 10;
                         }
-                        std::cout << c;
-                        */
+                        std::cout << c; */
+
                         std::cout << ".";
                         }
                     else if( grid_[get_i(j,i)] == 9999 )
@@ -219,13 +217,13 @@ int main(){
 
     grid_one.weight_cell(size_,destX,destY);
 
-    for( int i = 0; i < 50; i++ )  //MAIN LOOP THROUGH LIDARS ANGLE RANGE
+    for( int i = 0; i < 7; i++ )  //MAIN LOOP THROUGH LIDARS ANGLE RANGE
       {
         //float x = cos( theta[i]) * r[i];    //POLAR TO CARTESIAN CONVERSION
         //float y = sin( theta[i]) * r[i];
-        float x = ((rand() % 100) - 50) * 0.06; //DEBUG TEST DATA
-        float y = (rand() % 100) * 0.03;
-        grid_one.pad_path( CartPoint( x, y ), 8);
+        float x = ((rand() % 100) - 50) * 0.03; //DEBUG TEST DATA
+        float y = 1 + (rand() % 100) * 0.03;
+        grid_one.pad_path( CartPoint( x, y ), 16);
       }
 
     grid_one.compare_cell(50,0); //STARTS LISTING PATHS IN path_ STARTING AT i = 50. **NEEDS DEBUGGED**
