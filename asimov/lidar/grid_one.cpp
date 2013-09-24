@@ -24,13 +24,13 @@ class Grid{
 private:
     float resolution_;
     int size_;
-    std::vector<float> grid_;
+    std::vector<bool> grid_;
     std::vector<bool> path_;
 public:
     Grid( float resolution=.03, int size=100 ){
     size_ = size;            //THE NUMBER OF ELEMENTS ALONG AN AXIS OF THE GRID
     resolution_ = resolution;       //THE SIZE OF EACH GRID CELL IN METERS
-    grid_ = std::vector<float>( size_ * size_, 0.0 );
+    grid_ = std::vector<bool>( size_ * size_, false );
     path_ = std::vector<bool>( size_ * size_, false);   // CONSTRUCTS PACKED INTEGER ARRAY OF SIZE_ BY SIZE_
     }
 
@@ -54,76 +54,103 @@ public:
         r2 = radius * radius;
         for (x = -radius; x <= radius; x++) {
             y = (int) (sqrt(r2 - x*x) + 0.5);
-            set_cell(gridX + x, gridY + y, 1000);
-            set_cell(gridX + x, gridY - y, 1000);
-            set_cell(gridX + x, gridY + y - 1, 1000);
-            set_cell(gridX + x, gridY - y + 1, 1000);
+            set_cell(gridX + x, gridY + y, true);
+            set_cell(gridX + x, gridY - y, true);
+            set_cell(gridX + x, gridY + y - 1, true);
+            set_cell(gridX + x, gridY - y + 1, true);
+            set_cell(gridX + x, gridY + y - 2, true);
+            set_cell(gridX + x, gridY - y + 2, true);
         }
         for(y = -radius; y <= radius; y++){
             x = (int) (sqrt(r2 - y*y) - 0.5);
-            set_cell(gridX + x, gridY + y, 1000);
-            set_cell(gridX - x, gridY + y, 1000);
-            set_cell(gridX + x - 1, gridY + y, 1000);
-            set_cell(gridX - x + 1, gridY + y, 1000);
+            set_cell(gridX + x, gridY + y, true);
+            set_cell(gridX - x, gridY + y, true);
+            set_cell(gridX + x - 1, gridY + y, true);
+            set_cell(gridX - x + 1, gridY + y, true);
+            set_cell(gridX + x - 2, gridY + y, true);
+            set_cell(gridX - x + 2, gridY + y, true);
         }
     }
-
-    void weight_cell(int sizeX, int xf, int yf){ //WEIGHTS THE GRID ACCORDING TO A GRID LOCATION
-        for(int i = 0; i < sizeX * sizeX; i++)
-        {
-            grid_[i] = (float)sqrt(pow(xf - (i % size_), 2) + pow(yf - (i / size_),2));
-        }
-
-    }
-    void compare_cell(int i, int iteration) //RECURSIVE FN THAT SETS ELEMENTS OF PATH_ TO TRUE BASED ON WEIGHTING OF GRID_
+    void compare_cell(int i, int xf, int yf, int iteration) //RECURSIVE FN THAT SETS ELEMENTS OF PATH_ TO TRUE BASED ON WEIGHTING OF GRID_
     {
         int next,last,iteration_;
-        float a,b,c,d,e,f,g,h,min;
+        int a,b,c,d,e,f,g,h,min;
         iteration_ = iteration;
-        last = i;
            //STORES WEIGHTS OF NEARBY CELLS STARTING FROM LEFT
-        if(i - 1 >=0 && (i - 1) % size_ != size_ - 1)
+        if(i - 1 >=0 && (i - 1) % size_ != size_ - 1) //IF CELL ADDRESS IS NOT WRAPPED AROUND X OR BEYOND THE SCOPE OF THE ARRAY
         {
-            a = grid_[i - 1];
+            a = i - 1; //CELL ADDRESS TO THE LEFT
+            if(grid_[a] != true){ //IF NOT AN OBSTACLE OR BOUNDARY
+                a = sqrt(pow(xf - (a % size_),2) + pow(yf - (a / size_),2)); //SET a TO BLOCK DISTANCE FROM DESTINATION
+            }
+            else{ a = 2000;}
         }
-        else{ a = 1000;}
+        else{ a = 2000;}
         if(i + size_ - 1 <= size_ * size_ && (i - 1) % size_ != size_ - 1)
         {
-            b = grid_[i + size_ - 1];
+            b = i + size_ - 1; //FORWARD LEFT
+            if(grid_[b] != true){
+                b = sqrt(pow(xf - (b % size_),2) + pow(yf - (b / size_),2));
+            }
+            else{b = 2000;}
         }
-        else{b = 1000;}
+        else{b = 2000;}
         if(i + size_ <= size_ * size_)
         {
-            c = grid_[i + size_];
+            c = i + size_; //FORWARD
+            if(grid_[c] != true){
+                c = sqrt(pow(xf - (c % size_),2) + pow(yf - (c / size_),2));
+            }
+            else{c = 2000;}
         }
-        else{c = 1000;}
+        else{c = 2000;}
         if(i + size_ + 1 <= size_ * size_ && (i + 1) % size_ != 0)
         {
-            d = grid_[i + size_ + 1];
+            d = i + size_ + 1; //FORWARD RIGHT
+            if(grid_[d] != true){
+                d = sqrt(pow(xf - (d % size_),2) + pow(yf - (d / size_),2));
+            }
+            else{d = 2000;}
         }
-        else{d = 1000;}
+        else{d = 2000;}
         if(i + 1 <= size_ * size_ && (i + 1) % size_ != 0)
         {
-            e = grid_[i + 1];
+            e = i + 1; //RIGHT
+            if(grid_[e] != true){
+                e = sqrt(pow(xf - (e % size_),2) + pow(yf - (e / size_),2));
+            }
+            else{e = 2000;}
         }
-        else{e = 1000;}
+        else{e = 2000;}
         if(i + 1 - size_ >= 0 && (i + 1) % size_ != 0)
         {
-            f = grid_[i - size_ + 1];
+            f = i - size_ + 1; //BACKWARD RIGHT
+            if(grid_[f] != true){
+                f = sqrt(pow(xf - (f % size_),2) + pow(yf - (f / size_),2));
+            }
+            else{f = 2000;}
         }
-        else{ f = 1000;}
+        else{ f = 2000;}
         if(i - size_ >= 0)
         {
-            g = grid_[i - size_];
+            g = i - size_; //BACKWARD
+            if(grid_[g] != true){
+                g = sqrt(pow(xf - (g % size_),2) + pow(yf - (g / size_),2));
+            }
+            else{g = 2000;}
         }
-        else{g = 1000;}
+        else{g = 2000;}
         if(i - size_ - 1 >= 0 && (i - 1) % size_ != size_ - 1)
         {
-            h = grid_[i - size_ - 1];
+            h = i - size_ - 1; //BACKWARD LEFT
+            if(grid_[h] != true){
+                h = sqrt(pow(xf - (h % size_),2) + pow(yf - (h / size_),2));
+            }
+            else{h = 2000;}
         }
-        else{h = 1000;}
+        else{h = 2000;}
 
-        min = a;    //SETS MIN TO LOWEST ELEMENT OF GRID_
+        min = a;    //SETS MIN TO CHEAPEST CELL
         if( min > b){min = b;}
         if( min > c){min = c;}
         if( min > d){min = d;}
@@ -132,7 +159,7 @@ public:
         if( min > g){min = g;}
         if( min > h){min = h;}
 
-        next = 0;
+        next = i;
         if(min==a){next = i -1;}    //SETS NEXT TO THE 1D ADDRESS OF MIN
         if(min==b){next = i + size_ - 1;}
         if(min==c){next = i + size_;}
@@ -141,24 +168,18 @@ public:
         if(min==f){next = i + 1 - size_;}
         if(min==g){next = i + -size_;}
         if(min==h){next = i + -size_ - 1;}
-        if(min==0){next = 0;}
+        if(min==0){next = i;}
 
-        grid_[last] += 100; //LESSENS LIKELYHOOD OF BACKTRACKING
+        grid_[i] = true; //PREVENT BACKTRACKING
 
-        if(next != 0 && iteration_ < 200) //IF NEXT CELL ISNT DESTINATION
+        if(next != i && iteration_ < 200) //IF NEXT CELL ISNT DESTINATION AND LESS THAN 200 ITERATIONS
         {
             if(path_[next] != true) //IF NOT BACKTRACKING
             {
                 path_[next] = true; //SETS ELEMENT OF PATH GRID SIMILAR TO grid_ TO PATHED
             }
-            else
-            {
-                grid_[next] += 100; //IF BACKTRACKING REDUCE CHANCE OF REVISITING
-                //path_[next] = false;
-                //path_[last] = false; // CLEAR BACKTRACKED PATH
-            }
             iteration_++;
-            compare_cell(next, iteration_); //PROCESSES NEXT POINT
+            compare_cell(next, xf, yf, iteration_); //PROCESSES NEXT POINT
         }
         else
         {
@@ -166,36 +187,31 @@ public:
         }
     }
 
-    void print() //DEBUG PRINTOUT
+    void print(int xf, int yf) //DEBUG PRINTOUT
     {
         for( int i = size_ - 1; i >= 0; i--)
         {
             for( int j = 0; j < size_; j++)
-            {   if(path_[get_i(j,i)] == true)
+            {
+                if( j == xf && i == yf)
+                {
+                    std::cout << "X";
+                }
+                else if(path_[get_i(j,i)] == true)
                 {
                     std::cout << "!";
                 }
+
                 else
                 {
-                    if(grid_[get_i(j,i)] != 1000 && grid_[get_i(j,i)] > 1 )
+                    if(grid_[get_i(j,i)] != true)
                     {
-                        if(false) //SHOW WEIGHTS
-                        {
-                            int c = grid_[get_i(j,i)];
-                            while( c >= 10)
-                            {
-                                c /= 10;
-                            }
-                            std::cout << c;
-                        }
-                        else
                             std::cout << ".";
-                        }
-                    else if( grid_[get_i(j,i)] == 1000 )
+                    }
+                    else if( grid_[get_i(j,i)] == true )
                     {
                         std::cout << "#";
                     }
-                    else{ std::cout << "X";}
                 }
             }
             std::cout << "\n";
@@ -210,19 +226,18 @@ int main(){
     int size_ = 100;
     int destX = rand() % size_;
     int destY = 75;
-    int radius = 16;
-    grid_one.weight_cell(size_,destX,destY);
+    int radius = 4;
 
-    for( int i = 0; i < 5; i++ )  //MAIN LOOP THROUGH LIDARS ANGLE RANGE
+    for( int i = 0; i < 100; i++ )  //MAIN LOOP THROUGH LIDARS ANGLE RANGE
       {
         float x = ((rand() % 100) - 50) * 0.03;
         float y = 0.5 + (rand() % 100) * 0.03;
         grid_one.pad_path( CartPoint( x, y ), radius);
       }
 
-    grid_one.compare_cell(50,0); //STARTS LISTING PATHS IN path_ STARTING AT i = 50. **NEEDS DEBUGGED**
+    grid_one.compare_cell(50, destX, destY, 0); //STARTS LISTING PATHS IN path_ STARTING AT i = 50. **NEEDS DEBUGGED**
 
-    grid_one.print();   //TEST DATA DEBUG OUTPUT
+    grid_one.print(destX, destY);   //TEST DATA DEBUG OUTPUT
 
     return 0;
 }
