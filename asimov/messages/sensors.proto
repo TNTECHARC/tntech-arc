@@ -6,20 +6,40 @@ package asimov;
 //This entire package is a Google Protocol-Buffer message definition.
 //Each message defines sensor data.
 
+//A 3d vector where positive X is to the right, positive Y is forward, positive Z is up.
+message msg_Vector3
+{
+	optional float X = 1 [default = 0.0];
+	optional float Y = 2 [default = 0.0];
+	optional float Z = 3 [default = 0.0];
+}
 //Either Hokoyu or SICK laser scan in Polor Coords
 message msg_LaserScan
 {
 	repeated float angles = 1;    //The number of angles and the values corresponding to each scan value
 	repeated float ranges = 2;    //The number of ray-casts and the value of each in meters.
+	optional msg_Vector3 position = 3;  //The position of the range finder relative to the robot's origin. (OPTIONAL)
 }
-
 //A generic GPS scan. Doesn't really need explanation.
 message msg_GPS
 {
 	required float latitude = 1;
 	required float longitude = 2;
 }
-
+//The robot's position relative to an origin. This same data could also represent the relative position of a GPS waypoint, just change the msg_ID
+message msg_Position
+{
+	required msg_GPS origin = 1;  //The point being used as the origin.
+	required msg_Vector3 position = 2; //The position of the robot relative to the given origin.
+}
+//The roll, pitch, and yaw. 
+message msg_IMU
+{  //Liable to change.
+	required float rotX = 1; 
+	required float rotY = 2;
+	required float rotZ = 3;
+	optional msg_Vector3 position = 4; //the position of the IMU relative to the robot's origin. (OPTIONAL)
+}
 
 
 
