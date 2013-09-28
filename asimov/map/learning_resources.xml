@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+  Author: Cameron Vincent Chaparro
+  Date:   28 September 2013
+
+  The purpose of this document is to provide a starting point for anyone interested in contributing
+  to the design and implementation of the Mapping module for Hawking. Here you can find some useful
+  resources that I am using to learn about how mapping is generally done in robotics applications
+  by major researchers in the field. Feel free to add some resources you find helpful, but please
+  stick to the following format.
+
+  <resource_type type="document_format">
+    <main_title>
+      MAIN_DOCUMENT_TITLE
+    </main_title>
+    <subtitle>
+      DOCUMENT_SUBTITLE (If there is one)
+    </subtitle>
+    <authors>
+      <author>
+        FIRST_AUTHOR
+      </author>
+      <author>
+        SECOND_AUTHOR
+      </author>
+      ...
+      <author>
+        NTH_AUTHOR
+      </author>
+    </authors>
+    <publication_date>
+      DAY MONTH YEAR | UNKNOWN
+    </publication_date>
+    <resource_location type="type_of_resource_location">
+      WEB_ADDRESS | LINK_TO_PDF_DOCUMENT | etc.
+    </resource_location>
+  </resource_type>
+
+  Note that the `type' attribute of `resource_type' is generally going to be the documents file extension
+  For example, if the resource_type is a webpage, you would write:
+    <webpage type="html"> or <webpage type="php"> or etc.
+
+  Also, note that the `type' attribute of `resource_location' is generally going to be where you found the
+  document.
+  For example, if the resource_location is the library, you would write:
+    <resource_location type="ttu_library"> or <resource_location type="putnam_county_public_library"> or etc.
+-->
+
+<resources>
+  <!-- Resources about SLAM -->
+  <book type="pdf">
+    <main_title>
+      SLAM for Dummies
+    </main_title>
+    <subtitle>
+      A Tutorial Approach to Simultaneous Localization and Mapping
+    </subtitle>
+    <authors>
+      <author>Soren Riisgaard</author>
+      <author>Morten Rufus Blas</author>
+    </authors>
+    <publication_date>
+      Unknown
+    </publication_date>
+    <resource_location type="web">
+      http://ocw.mit.edu/courses/aeronautics-and-astronautics/16-412j-cognitive-robotics-spring-2005/projects/1aslam_blas_repo.pdf
+    </resource_location>
+  </book>
+</resources>
