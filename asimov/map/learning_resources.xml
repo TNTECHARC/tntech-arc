@@ -35,6 +35,9 @@
     <resource_location type="type_of_resource_location">
       WEB_ADDRESS | LINK_TO_PDF_DOCUMENT | etc.
     </resource_location>
+    <description>
+      BRIEF_EXPLANATION_OF_THE_RESOURCE
+    </description>
   </resource_type>
 
   Note that the `type' attribute of `resource_type' is generally going to be the documents file extension
@@ -48,7 +51,7 @@
 -->
 
 <resources>
-  <!-- Resources about SLAM -->
+  <!-- Resource 1 -->
   <book type="pdf">
     <main_title>
       SLAM for Dummies
@@ -66,5 +69,32 @@
     <resource_location type="web">
       http://ocw.mit.edu/courses/aeronautics-and-astronautics/16-412j-cognitive-robotics-spring-2005/projects/1aslam_blas_repo.pdf
     </resource_location>
+    <description>
+      A book that attempts to teach SLAM methods (in a very special case, but it seems like it could be extended to other cases)
+      using a tutorial-style approach. It would seem there are various code examples, which it doesn't need to be stated that
+      that is a useful thing.
+    </description>
   </book>
+
+  <!-- Resource 2 -->
+  <webpage type="html">
+    <main_title>
+      Correll Lab
+    </main_title>
+    <subtitle>
+      Introduction to Robotics
+    </subtitle>
+    <authors>
+      <author>Niklaus Correll</author>
+    </authors>
+    <publication_date>
+      Various dates
+    </publication_date>
+    <resource_location type="web">
+      correll.cs.colorado.edu/?page_id=169
+    </resource_location>
+    <description>
+      A class website (that seems dedicated to a lab class) that has various types of resources useful for robotics.
+    </description>
+  </webpage>
 </resources>
