@@ -30,6 +30,12 @@ lidar_o: lidar/lidar.cpp
 	$(C13_TO_O) lidar/lidar.cpp
 hoky_driver_o: hokoyu/hoky_driver.cpp
 	$(C13_TO_O) hokoyu/hoky_driver.cpp
+grid_o: lidar/grid.cpp
+	$(C13_TO_O) lidar/grid.cpp
+gps_o: gps/gps.cpp
+	$(C13_TO_O) gps/gps.cpp
+gps_driver_o: gps/gps_driver.cpp
+	$(C13_TO_O) gps/gps_driver.cpp
 
 #Link object files into an exe
 server_bsd_exe: server_driver_bsd_o server_bsd_o server_bsd_connection_o communication_pb_o
@@ -40,6 +46,8 @@ lidar_exe: lidar_o client_bsd_o communication_pb_o sensors_pb_o
 	$(LINK) Lidar_driver lidar.o client_bsd.o communication.pb.o sensors.pb.o $(PROTOBUF)
 hoky_driver_exe: hoky_driver_o client_bsd_o sensors_pb_o communication_pb_o
 	$(LINK) Hoky_driver hoky_driver.o client_bsd.o communication.pb.o sensors.pb.o $(PROTOBUF)
+gps_driver_exe: gps_o gps_driver_o sensors_pb_o communication_pb_o client_bsd_o
+	$(LINK) GPS_Driver gps.o gps_driver.o sensors.pb.o communication.pb.o client_bsd.o $(PROTOBUF)
 
 #Generates Google Protocol-Buffer messages in the subdirectory "messages"
 generate_protoc: messages/Makefile
@@ -47,6 +55,8 @@ generate_protoc: messages/Makefile
 
 
 #run files
+run_gps_driver:
+	./GPS_Driver
 run_hoky_driver:  
 	./Hoky_driver #hardware
 run_lidar_driver:
