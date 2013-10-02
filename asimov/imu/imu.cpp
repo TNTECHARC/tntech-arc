@@ -1,9 +1,9 @@
-#include "gps/gps.h"
+#include "imu/imu.h"
 namespace asimov
 {
 
 //#########################################################
-bool GPS::Open( char* port )
+bool IMU::Open( char* port )
 {
   file_desc_ = open( port, O_RDWR | O_NOCTTY ); //Create pseudo-socket. Valid values are greater than 0.
   if( file_desc_ < 0) { printf( "Unable to connect to device.\n" ); exit( 0 ); }
@@ -18,14 +18,13 @@ bool GPS::Open( char* port )
   return true;
 }
 //#########################################################
-bool GPS::Close()
+bool IMU::Close()
 { close( file_desc_ );
   return true;
 }
 //#########################################################
-bool GPS::GetLine( char* line, int length )
-{ tcflush( file_desc_, TCIOFLUSH );
-  char current = 0;
+bool IMU::GetLine( char* line, int length )
+{ char current = 0;
   int count = 0;
   //Look for '$' delimited line start
   while( current != '$' )
@@ -50,39 +49,34 @@ bool GPS::GetLine( char* line, int length )
   return true;
 }
 //#########################################################
-bool GPS::Read( asimov::msg_GPS& result )
+bool IMU::Read( asimov::msg_IMU& result )
 { bool found = false;
-  char status[] = "$GPGGA";
-  while( found == false)
-  { memset( buffer_, 0, buffer_size_ ); 
-    GetLine( buffer_, buffer_size_ ); 
-    char *pch = strtok( buffer_, ",*" );
-    if( strcmp( status, pch ) > 0 )
-    { //GPGGA response
-      found = true;
-      int hours, minutes, seconds;
-      float latitude, longitude, altitude;
-      float geoid, hdop;
-      int satellites;
-      char lon_sign, lat_sign;
-      sscanf( buffer_, "%*[^ ,]%2i%2i%2i,%f,%c,%f,%c,%*[^ ,]%i,%f,%f,%f,", &hours, &minutes, &seconds, &latitude, &lat_sign, &longitude, &lon_sign, &satellites, &hdop, &altitude, &geoid );
-      int time = seconds + 60*minutes + 60*60*hours;
-      if( lat_sign == 'S' )
-        latitude = -latitude; 
-      if( lon_sign == 'W' )
-        longitude = -longitude; 
+  char command[] = "$VNRRG,8*00"; //Last two zeroes are hexidecimal to be replaced.
+  unsigned int sum = Checksum( command+1, strlen( command )-4 );
+  sprintf( command+strlen(command)-2, "%2X", sum );
+  memset( buffer_, 0, buffer_size_ ); 
+  GetLine( buffer_, buffer_size_ ); 
+  float Yaw, Pitch, Roll;
+  sscanf( buffer_, "%*[^ ,]%*d%*c%f%*c%f%*c%f", &Yaw, &Pitch, &Roll );
 
-      result.Clear();
-      result.set_latitude( latitude );
-      result.set_longitude( longitude );
-      result.set_altitude( altitude );
-      result.set_seconds( time );
-      result.set_geoid( geoid );
-      result.set_hdop( hdop );
-      return true;
-    }	
-  }
-  return false;
+  //Return the results
+  result.Clear();
+  result.set_yaw(   Yaw   );
+  result.set_pitch( Pitch );
+  result.set_roll(  Roll  );
+  return true;
+}
+//#########################################################
+bool IMU::Write( char* line, int length )
+{ write( file_desc_, line, length );
+  return true;
+}
+//#########################################################
+unsigned char IMU::Checksum( char* command, int length )
+{ unsigned char result = 0;
+  for( int i = 0; i < length; i++ )
+    result ^= (unsigned char)command[i];
+  return result;
 }
 //#########################################################
 

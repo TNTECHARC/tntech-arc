@@ -20,11 +20,18 @@ message msg_LaserScan
 	repeated float ranges = 2;    //The number of ray-casts and the value of each in meters.
 	optional msg_Vector3 position = 3;  //The position of the range finder relative to the robot's origin. (OPTIONAL)
 }
-//A generic GPS scan. Doesn't really need explanation.
+//A generic GPS scan (GPPGA)-(reference: aprs.gids.nl/nmea/)
 message msg_GPS
 {
-	required float latitude = 1;
-	required float longitude = 2;
+	required float latitude  = 1; //[-90, 90]
+	required float longitude = 2; //[-180, 180]
+	required float altitude  = 3; //Meters above mean sea level
+	//Time is in UTC format
+	required int32 seconds = 4;
+	//Height (Meters) of geoid above WGS84 ellipsoid
+	required float geoid = 5;
+	//Horizontal dilution of precision.
+	required float hdop = 6;
 }
 //The robot's position relative to an origin. This same data could also represent the relative position of a GPS waypoint, just change the msg_ID
 message msg_Position
@@ -35,9 +42,9 @@ message msg_Position
 //The roll, pitch, and yaw. 
 message msg_IMU
 {  //Liable to change.
-	required float rotX = 1; 
-	required float rotY = 2;
-	required float rotZ = 3;
+	required float yaw   = 1; 
+	required float pitch = 2;
+	required float roll  = 3;
 	optional msg_Vector3 position = 4; //the position of the IMU relative to the robot's origin. (OPTIONAL)
 }
 
