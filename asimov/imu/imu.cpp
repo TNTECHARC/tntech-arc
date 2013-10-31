@@ -9,7 +9,7 @@ bool IMU::Open( char* port )
   if( file_desc_ < 0) { printf( "Unable to connect to device.\n" ); exit( 0 ); }
   tcgetattr( file_desc_, &old_tio_ ); //Save current settings of serial port.
   memset( &new_tio_, 0, sizeof(new_tio_) ); //Blank out new settings
-  new_tio_.c_cflag = B4800 | CRTSCTS | CS8 | CLOCAL | CREAD; //19200Baudrate. 8bit bytes. Local connection. May read.
+  new_tio_.c_cflag = B115200 | CRTSCTS | CS8 | CLOCAL | CREAD; //19200Baudrate. 8bit bytes. Local connection. May read.
   new_tio_.c_iflag = IGNPAR | ICRNL; //Ignore Parity.
   new_tio_.c_oflag = 0;
   new_tio_.c_lflag = ICANON; //Canonical
@@ -26,7 +26,6 @@ bool IMU::Close()
 bool IMU::GetLine( char* line, int length )
 { char current = 0;
   int count = 0;
-  //Look for '$' delimited line start
   while( current != '$' )
   { read( file_desc_, &current, 1 );
     ++count;
@@ -51,19 +50,36 @@ bool IMU::GetLine( char* line, int length )
 //#########################################################
 bool IMU::Read( asimov::msg_IMU& result )
 { bool found = false;
-  char command[] = "$VNRRG,8*00"; //Last two zeroes are hexidecimal to be replaced.
-  unsigned int sum = Checksum( command+1, strlen( command )-4 );
-  sprintf( command+strlen(command)-2, "%2X", sum );
   memset( buffer_, 0, buffer_size_ ); 
   GetLine( buffer_, buffer_size_ ); 
-  float Yaw, Pitch, Roll;
-  sscanf( buffer_, "%*[^ ,]%*d%*c%f%*c%f%*c%f", &Yaw, &Pitch, &Roll );
+  double Yaw, Pitch, Roll;
+  double MagX, MagY, MagZ;
+  double AccelX, AccelY, AccelZ;
+  double GyroX, GyroY, GyroZ;
+  //printf( "%s\n", buffer_ );
+  sscanf( buffer_, "%*[^,],%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf", 
+    &Yaw, &Pitch, &Roll,
+    &MagX, &MagY, &MagZ,
+    &AccelX, &AccelY, &AccelZ,
+    &GyroX, &GyroY, &GyroZ );
 
   //Return the results
   result.Clear();
   result.set_yaw(   Yaw   );
   result.set_pitch( Pitch );
   result.set_roll(  Roll  );
+
+  result.set_magx( MagX );
+  result.set_magy( MagY );
+  result.set_magz( MagZ );
+
+  result.set_accelx( AccelX );
+  result.set_accely( AccelY );
+  result.set_accelz( AccelZ );
+
+  result.set_gyrox( GyroX );
+  result.set_gyroy( GyroY );
+  result.set_gyroz( GyroZ );
   return true;
 }
 //#########################################################

@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
+#include <iomanip>
 #include <string>
 #include <string.h>
 #include <algorithm>
 #include <vector>
 
 #include "messages/sensors.pb.h"
-#include "messages/message_ids.h"
-#include "network/client_bsd.h"
 #include "imu/imu.h"
 
 //#########################################################
@@ -17,37 +17,39 @@
 //#########################################################
 int main( int argc, char* argv[] )
 {
-  printf( "Parameters: optional(device_name), optional(server address)\n" );
-  char* device = "/dev/ttyACM0";
-  std::string address = "127.0.0.1";
-  if( argc == 3 )
-  { address = std::string( argv[2] );
-    device  = argv[1];
-  }
-  else if( argc == 2 )
-  { device = argv[1];
-  }
   asimov::IMU imu_conn;
   asimov::msg_IMU imu_data;
   std::string line_buffer;
-  
-  asimov::ClientBSD client;
-  client.set_name( "IMU driver" );
-  client.set_keepalive( 100 );
 
+  double posX = 0.0;
+  double posY = 0.0;
+  double posZ = 0.0;
+
+  double velX = 0.0;
+  double velY = 0.0;
+  double velZ = 0.0;
+  
   char answer;
   do
   { //Attempt to connect to the server as many times as the user wants to.
-    if( client.Connect( address ) && imu_conn.Open( device ) )
-    { //If successful connection to server...
-      while( client.is_connected() )
-      { //... listen until the connection is broken.
-        if( client.buffer_size() == 0 )
-        { imu_conn.Read( imu_data );
-          imu_data.SerializeToString( &line_buffer );
-          client.Write( line_buffer, asimov::msg_IMU_ID );
-        }
-        client.Listen();
+    if( imu_conn.Open() )
+    { while( imu_conn.Read( imu_data ) )
+      {
+        //std::cout << "Yaw(" << imu_data.yaw() << ")   Pitch(" << imu_data.pitch() << ")   Roll(" << imu_data.roll() << ")\n"; 
+        //std::cout << "MagX(" << imu_data.magx() << ")   MagY(" << imu_data.magy() << ")   MagZ(" <<imu_data.magz() << ")\n"; 
+        //std::cout << "AccelX(" << imu_data.accelx() << ")   AccelY(" << imu_data.accely() << ")   AccelZ(" << imu_data.accelz() << ")\n"; 
+        //std::cout << "GyroX(" << imu_data.gyrox() << ")   GyroY(" << imu_data.gyroy() << ")   GyroZ(" << imu_data.gyroz() << ")\n"; 
+        velX += ( imu_data.accelx() / 40.0 );
+        velY += (imu_data.accely() / 40.0 );
+        velZ += ( imu_data.accelz() / 40.0 );
+
+        posX += ( velX / 40.0 );
+        posY += ( velY / 40.0 );
+        posZ += ( velZ / 40.0 );
+        std::cout << std::left << std::setw(15) << imu_data.yaw() << std::setw(15) << imu_data.pitch() << std::setw(15) << imu_data.roll() << "\n";
+        //std::cout << std::left << std::setw(15) << posX << std::setw(15) << posY << std::setw(15) << posZ << "\n";
+        
+	imu_data.Clear();
       }
     }
     //A standard CSC-2100 prompt.

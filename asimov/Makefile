@@ -42,8 +42,8 @@ imu_driver_o: imu/imu_driver.cpp
 	$(C13_TO_O) imu/imu_driver.cpp
 
 #Link object files into an exe
-imu_driver_exe: imu_o imu_driver_o client_bsd_o sensors_pb_o communication_pb_o
-	$(LINK) IMU_Driver imu.o imu_driver.o sensors.pb.o communication.pb.o client_bsd.o $(PROTOBUF)
+imu_driver_exe: imu_o imu_driver_o sensors_pb_o
+	$(LINK) IMU_Driver imu.o imu_driver.o sensors.pb.o $(PROTOBUF)
 server_bsd_exe: server_driver_bsd_o server_bsd_o server_bsd_connection_o communication_pb_o
 	$(LINK) ServerBSD server_bsd.o server_driver_bsd.o server_bsd_connection.o communication.pb.o $(PROTOBUF)
 client_bsd_exe: client_driver_bsd_o client_bsd_o communication_pb_o

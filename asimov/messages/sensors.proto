@@ -42,10 +42,18 @@ message msg_Position
 //The roll, pitch, and yaw. 
 message msg_IMU
 {  //Liable to change.
-	required float yaw   = 1; 
-	required float pitch = 2;
-	required float roll  = 3;
-	optional msg_Vector3 position = 4; //the position of the IMU relative to the robot's origin. (OPTIONAL)
+	required double yaw    = 1;  //Degrees
+	required double pitch  = 2;  //Degrees
+	required double roll   = 3;  //Degrees
+	required double magX   = 4;  
+	required double magY   = 5;
+	required double magZ   = 6;
+	required double accelX = 7;  // m/(s^2)
+	required double accelY = 8;  // m/(s^2)
+	required double accelZ = 9;  // m/(s^2)
+	required double gyroX  = 10; // rad/s
+	required double gyroY  = 11; // rad/s
+	required double gyroZ  = 12; // rad/s
 }
 
 

@@ -75,8 +75,10 @@ class Andros2(object):
 		#wheel speeds
 		self.leftWheel_  = 0
 		self.rightWheel_ = 0
+		#release the brakes
+		self.setVehicleSafety( 'OFF' )
 		# Open the serial port and start sending thread
-		#self.serial_port_ = Serial(port=port, baudrate=baudrate)
+		self.serial_port_ = Serial(port=port, baudrate=baudrate)
 		self.transmitting_ = True
 		self.thread_lock_ = threading.Lock()
 		self.thread_ = threading.Thread(target=self.transmitPackets)
@@ -99,12 +101,22 @@ class Andros2(object):
 	def setSpeed( self, left = 0, right = 0 ):
 		self.thread_lock_.acquire()
 		try:
-			self.leftWheel_  = left
-			self.rightWheel_ = right
+			self.leftWheel_  = left  = int(left)
+			self.rightWheel_ = right = int(right)
 			speed = int( (left+right)/2.0 )#right + left
 			pivot = int( (right-left)/2.0 )#right - left
-			self.addByteToDataPacket(self.clampValue(speed) + 127, 6) #speed
-			self.addByteToDataPacket(self.clampValue(pivot) + 127, 7) #pivot
+			self.addByteToDataPacket(self.clampValue(speed) + 127, 7) #speed
+			self.addByteToDataPacket(self.clampValue(pivot) + 127, 6) #pivot
+			print "speed (", left, ", ", right, ")"
+		finally:
+			self.thread_lock_.release()
+	def setSpeedPivot( self, speed = 0, pivot = 0 ):
+		self.thread_lock_.acquire()
+		try:
+			speed = int(speed)
+			pivot = int(pivot)
+			self.addByteToDataPacket(self.clampValue(speed) + 127, 7) #speed
+			self.addByteToDataPacket(self.clampValue(pivot) + 127, 6) #pivot
 		finally:
 			self.thread_lock_.release()
 	###################### END COMMAND BLOCKS ######################
@@ -161,23 +173,34 @@ class Andros2(object):
 			finally:
 				self.thread_lock_.release()
 			for byte in dataPacket_copy:
-				#self.serial_port.write(chr(byte))
-				sleep(39.5e-3)
+				self.serial_port_.write(chr(byte))
+				sleep(39.5e-4)
 	def outputPacket(self):
 		for byte in self.dataPacket_:
 		    print hex(byte),
 		print "|"
 	def close(self):
 		self.transmitting_ = False
-		#self.serial_port.close()
+		self.setVehicleSafety( 'ON' )
+		self.serial_port_.close()
 		self.thread_.join()
 ############End Andros2######################################
 if __name__ == '__main__':
 	K_ = Andros2()
 	try:
 		while True:
-			sleep(0.5)
+			data = raw_input()
+			if data == 'quit':
+				break
+			if str(data[0]).isdigit() or str(data[1]).isdigit():
+				nums = data.split()
+				K_.setSpeed( nums[0], nums[1] )
+			elif data[0:6] == 'clear':
+				K_.stopCommand( data[6:] )
+			else:
+				K_.command( data )
 	finally:
+		K_.setSpeed( 0, 0 )
 		K_.close()
 
 	
