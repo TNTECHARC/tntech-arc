@@ -1,0 +1,8 @@
+prefix=/home/daniel/tntech-arc/ros/devel
+
+Name: andros
+Description: Description of andros
+Version: 0.0.1
+Cflags: 
+Libs: -L/home/daniel/tntech-arc/ros/devel/lib 
+Requires: 

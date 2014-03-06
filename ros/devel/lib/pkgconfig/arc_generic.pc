@@ -1,0 +1,8 @@
+prefix=/home/daniel/tntech-arc/ros/devel
+
+Name: arc_generic
+Description: Description of arc_generic
+Version: 0.0.1
+Cflags: 
+Libs: -L/home/daniel/tntech-arc/ros/devel/lib 
+Requires: 

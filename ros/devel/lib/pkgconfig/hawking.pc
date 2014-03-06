@@ -1,0 +1,8 @@
+prefix=/home/daniel/tntech-arc/ros/devel
+
+Name: hawking
+Description: Description of hawking
+Version: 0.0.1
+Cflags: 
+Libs: -L/home/daniel/tntech-arc/ros/devel/lib 
+Requires: 
