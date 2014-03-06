@@ -1,3 +1,7 @@
+# The ROS Build Folder #
+########################
+ros/build/
+
 # Compiled source #
 ###################
 *.com
